@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/**","/js/**", "/img/**", "/accounts/login", "/css/*", "/accounts/registration").permitAll()
+                .antMatchers("/","/js/**", "/img/**", "/accounts/login", "/css/*", "/accounts/registration").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedPage("/denied")
@@ -42,7 +42,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/accounts/login").failureUrl("/accounts/login?error=true")
         .permitAll()
                 .and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+                .logout().deleteCookies("JSESSIONID").logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll()
+                .and()
+                .rememberMe().key("uniqueAndSecret");
 
     }
 
