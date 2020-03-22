@@ -22,6 +22,7 @@ import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -70,5 +71,9 @@ public class UserService implements UserDetailsService {
     public User getFromDto(UserDTO user) {
         return User.builder().email(user.getEmail()).username(user.getUsername()).confirmPassword(user.getConfirmPassword())
                 .password(user.getPassword()).build();
+    }
+
+    public Optional<User> getByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

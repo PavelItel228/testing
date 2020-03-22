@@ -45,3 +45,12 @@
 #lang li a{
     color: #56baed;
 }
+.terms{
+    display:block;
+    position:absolute;
+    bottom:0;
+    right:0;
+    width:100%;
+    background:#eee;
+    border:1px solid #ddd;
+}
