@@ -1,11 +1,13 @@
 package kpi.prject.testing.testing.entity;
 
 import kpi.prject.testing.testing.entity.enums.Role;
+import kpi.prject.testing.testing.entity.enums.Status;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +31,17 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "created", nullable = false)
+    private LocalDate created;
+
+    @Column(name = "updated", nullable = false)
+    private LocalDate updated;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Enumerated(EnumType.STRING)
     private Role role;
