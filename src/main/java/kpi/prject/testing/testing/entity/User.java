@@ -1,8 +1,13 @@
 package kpi.prject.testing.testing.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kpi.prject.testing.testing.entity.enums.Role;
 import kpi.prject.testing.testing.entity.enums.Status;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,6 +15,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -34,11 +40,17 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @CreationTimestamp
     @Column(name = "created", nullable = false)
     private LocalDate created;
 
+    @UpdateTimestamp
     @Column(name = "updated", nullable = false)
     private LocalDate updated;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Report> reports;
 
     @Enumerated(EnumType.STRING)
     private Status status;

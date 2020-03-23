@@ -53,14 +53,13 @@ public class UserService implements UserDetailsService {
         }
         user.setStatus(Status.Active);
         user.setRole(Role.ROLE_USER);
-        user.setCreated(LocalDate.now());
-        user.setUpdated(LocalDate.now());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         try {
             userRepository.save(user);
         }
         catch (DataIntegrityViolationException e){
             log.warn("POST registration: uniq fields duplicate");
+            e.printStackTrace();
             result.rejectValue("username", "3", "login or email is already taken");
             result.rejectValue("email", "3", "login or email is already taken");
             throw new UserExistsException(user.getUsername());

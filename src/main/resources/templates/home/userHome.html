@@ -5,7 +5,12 @@
     <title>Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" th:href="@{/css/login.css}">
-
+    <link rel="stylesheet" th:href="@{/css/userPage.css}">
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.js"
+            integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+            crossorigin="anonymous"></script>
+    <script th:src="@{/js/tableToggle.js}"></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -13,10 +18,53 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="content">
+    <table class="table-condensed table table-hover" style="border-collapse:collapse;">
+        <caption th:text="#{string.reports.list}">Reports List</caption>
+        <thead>
+        <tr>
+            <td th:text="#{string.id}"></td>
+            <td th:text="#{string.name}"></td>
+            <td th:text="#{string.status}"></td>
+            <td th:text="#{string.created}"></td>
+            <td th:text="#{string.updated}"></td>
+        </tr>
+        </thead>
+        <tbody>
+        <span th:each="report : ${reports}">
+        <tr class="accordion-toggle" data-toggle="collapse" th:data-target="'#' + ${report.getId()}">
+            <th scope="row" th:text="${report.getId()}"></th>
+            <td th:text="${report.getName()}"></td>
+            <td th:switch="${report.getStatus().name()}">
+                <span th:case="ACCEPTED" th:text="#{string.accepted}" class="font-weight-bold"
+                      style="color: green"></span>
+                <span th:case="NOT_ACCEPTED" th:text="#{string.not.accepted}" class="font-weight-bold"
+                      style="color : red"></span>
+                <span th:case="QUEUE" th:text="#{string.queue}" class="font-weight-bold" style="color: #ffbf00"></span>
+            </td>
+            <td th:text="${report.getCreated()}"></td>
+            <td th:text="${report.getUpdated()}"></td>
+        </tr>
+        <tr>
+            <td colspan="5" class="hiddenRow"><div class="accordian-body collapse" th:id="${report.getId()}"
+                                                   th:text="${report.getDescription()}"></div></td>
+        </tr>
+    </span>
+        <tbody>
+    </table>
+
+    <button th:href="@{/home/add}" type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}"></button>
+
+    <nav style="display: flex; justify-content: center" aria-label="Page navigation example">
+        <ul class="pagination">
+        <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">
+            <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>
+        </span>
+        </ul>
+    </nav>
+</div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
-
-
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
