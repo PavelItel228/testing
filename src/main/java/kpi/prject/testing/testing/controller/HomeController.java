@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
@@ -50,5 +51,15 @@ public class HomeController {
     @GetMapping("/add")
     public String getAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) {
         model.addAttribute("username", principal.getName());
+        return "home/addReport";
+    }
+
+    @PostMapping("/add")
+    public String postAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) {
+        model.addAttribute("username", principal.getName());
+        User user = userService.getByUsername(principal.getName()).orElse(new User());
+        reportService.save(reportService.getFromDTO(report), user);
+        return "redirect:/home";
     }
 }
+

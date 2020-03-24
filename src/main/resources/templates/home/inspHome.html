@@ -14,6 +14,46 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<div class="content">
+    <table class="table-condensed table table-hover" style="border-collapse:collapse;">
+        <caption th:text="#{string.reports.list}">Reports List</caption>
+        <thead>
+        <tr>
+            <td th:text="#{string.id}"></td>
+            <td th:text="#{string.name}"></td>
+            <td th:text="#{string.created}"></td>
+            <td th:text="#{string.updated}"></td>
+        </tr>
+        </thead>
+        <tbody>
+        <span th:each="report : ${reports}">
+        <tr class="accordion-toggle" data-toggle="collapse" th:data-target="'#' + ${report.getId()}">
+            <th scope="row" th:text="${report.getId()}"></th>
+            <td th:text="${report.getName()}"></td>
+            <td th:text="${report.getCreated()}"></td>
+            <td th:text="${report.getUpdated()}"></td>
+        </tr>
+        <tr>
+            <td colspan="5" class="hiddenRow"><div class="accordian-body collapse" th:id="${report.getId()}"
+                                                   th:text="${report.getDescription()}"></div></td>
+        </tr>
+    </span>
+        <tbody>
+    </table>
+    <a th:href="@{/home/add}">
+        <button type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}">
+        </button>
+    </a>
+
+    <nav style="display: flex; justify-content: center" aria-label="Page navigation example">
+        <ul class="pagination">
+        <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">
+            <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>
+        </span>
+        </ul>
+    </nav><null>
+</div>
+
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 

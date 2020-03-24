@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title th:text="#{string.home}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" th:href="@{/css/login.css}">
     <link rel="stylesheet" th:href="@{/css/userPage.css}">
@@ -52,8 +52,10 @@
     </span>
         <tbody>
     </table>
-
-    <button th:href="@{/home/add}" type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}"></button>
+    <a th:href="@{/home/add}">
+        <button type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}">
+        </button>
+    </a>
 
     <nav style="display: flex; justify-content: center" aria-label="Page navigation example">
         <ul class="pagination">
@@ -61,7 +63,7 @@
             <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>
         </span>
         </ul>
-    </nav>
+    </nav><null>
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>

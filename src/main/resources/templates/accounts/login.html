@@ -35,7 +35,7 @@
             <p id="logout" class="FadeIn fifth" th:if="${param.logout}" th:text="#{string.login.user.been.logged.out}"></p>
         </div>
     </form>
-    <p class="text-center"><a href="#" th:text="#{string.login.button.create.account}"></a></p>
+    <p class="text-center"><a th:href="@{/accounts/registration}" th:text="#{string.login.button.create.account}"></a></p>
     <ul style="display: flex; align-items: center; justify-content: center" id="lang">
         <li><a class="underlineHover" href="?lang=en" th:text="EN"></a></li>
         <li><a class="underlineHover" href="?lang=ua" th:text="UA"></a></li>
