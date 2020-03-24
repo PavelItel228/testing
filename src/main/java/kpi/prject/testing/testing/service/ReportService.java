@@ -1,5 +1,6 @@
 package kpi.prject.testing.testing.service;
 
+import kpi.prject.testing.testing.dto.DeclineReasonDTO;
 import kpi.prject.testing.testing.dto.ReportDTO;
 import kpi.prject.testing.testing.entity.Report;
 import kpi.prject.testing.testing.entity.User;
@@ -30,7 +31,11 @@ public class ReportService {
     }
 
     public Page<Report> getAllByUser(User user, Pageable pageable) {
-        return reportsRepository.findByUser(user, pageable).orElse(new PageImpl<Report>(new ArrayList<>()));
+        return reportsRepository.findByUser(user, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    public Page<Report> getAllByInspectorAndStatus(User user, ReportStatus status, Pageable pageable) {
+        return reportsRepository.findAllByInspectorAndStatus(user, status, pageable).orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     public Report getFromDTO(ReportDTO reportDTO) {
@@ -49,5 +54,20 @@ public class ReportService {
     {
         Random rand = new Random();
         return list.get(rand.nextInt(list.size()));
+    }
+
+    public Optional<Report> getById(long id) {
+        return reportsRepository.findById(id);
+    }
+
+    public void acceptReport(Report report) {
+        report.setStatus(ReportStatus.ACCEPTED);
+        reportsRepository.save(report);
+    }
+
+    public void declineReport(Report reportToDecline, DeclineReasonDTO reportReason) {
+        reportToDecline.setReason(reportReason.getReason());
+        reportToDecline.setStatus(ReportStatus.NOT_ACCEPTED);
+        reportsRepository.save(reportToDecline);
     }
 }

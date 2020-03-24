@@ -53,4 +53,7 @@ public class Report {
     @UpdateTimestamp
     @Column(name = "updated", nullable = false)
     private LocalDate updated;
+
+    @Column(name = "decline_reason", columnDefinition = "TEXT")
+    private String reason;
 }

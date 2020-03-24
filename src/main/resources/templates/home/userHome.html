@@ -57,7 +57,7 @@
         </button>
     </a>
 
-    <nav style="display: flex; justify-content: center" aria-label="Page navigation example">
+    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center" aria-label="Page navigation example">
         <ul class="pagination">
         <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">
             <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>

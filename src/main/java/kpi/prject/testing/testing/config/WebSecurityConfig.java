@@ -39,6 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/","/js/**", "/img/**", "/accounts/login", "/css/*", "/accounts/registration").permitAll()
+                .antMatchers("/home/accept/*").hasAuthority("ROLE_INSPECTOR")
+                .antMatchers("/home/add").hasAuthority("ROLE_USER")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedPage("/denied")

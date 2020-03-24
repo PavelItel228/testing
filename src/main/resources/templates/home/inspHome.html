@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <title th:text="#{string.home}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" th:href="@{/css/login.css}">
-
+    <link rel="stylesheet" th:href="@{/css/userPage.css}">
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.js"
+            integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+            crossorigin="anonymous"></script>
+    <script th:src="@{/js/tableToggle.js}"></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -32,26 +38,34 @@
             <td th:text="${report.getName()}"></td>
             <td th:text="${report.getCreated()}"></td>
             <td th:text="${report.getUpdated()}"></td>
+            <td>
+                <form th:action="@{'home/accept/' + ${report.getId()}}" th:method="post">
+                    <button type="submit" class="btn btn-success" onclick="return confirm('You sure?')"
+                            th:text="#{string.accept}"></button>
+                </form>
+            </td>
+            <td>
+            <form th:action="@{'home/decline/' + ${report.getId()}}" th:method="get">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('You sure?')" th:text="#{string.decline}"></button>
+            </form>
+            </td>
         </tr>
         <tr>
-            <td colspan="5" class="hiddenRow"><div class="accordian-body collapse" th:id="${report.getId()}"
+            <td colspan="6" class="hiddenRow"><div class="accordian-body collapse" th:id="${report.getId()}"
                                                    th:text="${report.getDescription()}"></div></td>
         </tr>
     </span>
         <tbody>
     </table>
-    <a th:href="@{/home/add}">
-        <button type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}">
-        </button>
-    </a>
 
-    <nav style="display: flex; justify-content: center" aria-label="Page navigation example">
+    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center" aria-label="Page navigation example">
         <ul class="pagination">
         <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">
             <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>
         </span>
         </ul>
-    </nav><null>
+    </nav>
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
