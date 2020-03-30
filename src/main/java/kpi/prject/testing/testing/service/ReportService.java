@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class ReportService {
         return Report.builder().name(reportDTO.getName()).description(reportDTO.getDescription()).build();
     }
 
+    @Transactional
     public void save(Report report, User owner) {
         report.setStatus(ReportStatus.QUEUE);
         report.setUser(owner);
@@ -69,5 +71,21 @@ public class ReportService {
         reportToDecline.setReason(reportReason.getReason());
         reportToDecline.setStatus(ReportStatus.NOT_ACCEPTED);
         reportsRepository.save(reportToDecline);
+    }
+
+    public void update(Report report,ReportDTO reportDTO) {
+        report.setName(reportDTO.getName());
+        report.setDescription(reportDTO.getDescription());
+        report.setStatus(ReportStatus.QUEUE);
+        reportsRepository.save(report);
+    }
+
+    @Transactional
+    public void changeInspector(Report report) {
+        List<User> inspectors = userRepository.findAllByRole(Role.ROLE_INSPECTOR).orElse(new ArrayList<>());
+        inspectors.remove(report.getInspector());
+        report.setStatus(ReportStatus.QUEUE);
+        report.setInspector(getRandomElement(inspectors));
+        reportsRepository.save(report);
     }
 }

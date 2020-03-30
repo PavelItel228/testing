@@ -24,7 +24,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@ToString
 @Table(name = "usr")
 public class User implements UserDetails {
     @Id

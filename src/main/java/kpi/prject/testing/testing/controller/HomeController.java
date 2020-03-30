@@ -98,5 +98,38 @@ public class HomeController {
         reportService.declineReport(reportToDecline.get(), reportReason);
         return "redirect:/home";
     }
+
+    @GetMapping(value = "/update/{report_id}")
+    public String updateReport(@ModelAttribute("report") ReportDTO report, @PathVariable String report_id,
+                                Model model,
+                                Principal principal) {
+        Optional<Report> reportToUpdate = reportService.getById(Long.parseLong(report_id));
+        if(!reportToUpdate.isPresent()){
+            return "redirect:/home";
+        }
+        model.addAttribute("report", reportToUpdate.get());
+        model.addAttribute("username", principal.getName());
+        return "home/updateReport";
+    }
+
+    @PostMapping(value = "/update/{report_id}")
+    public String updateReportPost(@ModelAttribute("report") ReportDTO report, @PathVariable String report_id) {
+        Optional<Report> reportToUpdate = reportService.getById(Long.parseLong(report_id));
+        if(!reportToUpdate.isPresent()){
+            return "redirect:/home";
+        }
+        reportService.update(reportToUpdate.get(), report);
+        return "redirect:/home";
+    }
+
+    @PostMapping(value = "/change/{report_id}")
+    public String changeReportPost(@PathVariable String report_id) {
+        Optional<Report> reportToUpdate = reportService.getById(Long.parseLong(report_id));
+        if(!reportToUpdate.isPresent()){
+            return "redirect:/home";
+        }
+        reportService.changeInspector(reportToUpdate.get());
+        return "redirect:/home";
+    }
 }
 

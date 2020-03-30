@@ -28,6 +28,8 @@
             <td th:text="#{string.status}"></td>
             <td th:text="#{string.created}"></td>
             <td th:text="#{string.updated}"></td>
+            <td></td>
+            <td></td>
         </tr>
         </thead>
         <tbody>
@@ -44,10 +46,31 @@
             </td>
             <td th:text="${report.getCreated()}"></td>
             <td th:text="${report.getUpdated()}"></td>
+            <div style="display:inline" th:with="declined = ${report.getStatus().name() == 'NOT_ACCEPTED'}">
+                <td th:if="${declined}">
+                    <form th:action="@{'home/update/' + ${report.getId()}}" th:method="get">
+                    <button type="submit" class="btn btn-warning"
+                            onclick="return confirm('You sure?')" th:text="#{string.correct}"></button>
+                </form>
+                </td>
+                <td th:if="${declined}">
+                    <form th:action="@{'home/change/' + ${report.getId()}}" th:method="post">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('You sure?')" th:text="#{string.replace}"></button>
+                </form>
+                </td>
+
+                <td th:unless="${declined}"></td>
+                <td th:unless="${declined}"></td>
+            </div>
         </tr>
         <tr>
-            <td colspan="5" class="hiddenRow"><div class="accordian-body collapse" th:id="${report.getId()}"
-                                                   th:text="${report.getDescription()}"></div></td>
+            <td colspan="7" class="hiddenRow">
+                <div class="accordian-body collapse" th:id="${report.getId()}">
+                    <div th:text="${report.getDescription()}"></div>
+                    <div style="background-color: #ffb2b2; border-top: 0.5px solid grey;" th:if="${report.getReason() != null}" th:text="#{string.reason.toggle} + ${report.getReason()}"></div>
+                </div>
+                </td>
         </tr>
     </span>
         <tbody>
@@ -57,13 +80,15 @@
         </button>
     </a>
 
-    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center" aria-label="Page navigation example">
+    <nav th:if="${reports.getTotalPages() != 0}" style="display: flex; justify-content: center"
+         aria-label="Page navigation example">
         <ul class="pagination">
         <span th:each="page: ${#numbers.sequence(0, reports.getTotalPages() - 1)}">
             <li class="page-item"><a class="page-link" th:href="'?page=' + ${page}" th:text="${page + 1}"></a></li>
         </span>
         </ul>
-    </nav><null>
+    </nav>
+    <null>
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
