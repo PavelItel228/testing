@@ -5,6 +5,7 @@ import kpi.prject.testing.testing.entity.User;
 import kpi.prject.testing.testing.exceptions.InvalidUserException;
 import kpi.prject.testing.testing.exceptions.UserExistsException;
 import kpi.prject.testing.testing.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
+@Slf4j
 @RequestMapping("/accounts")
 public class AccountsController {
 
@@ -23,14 +25,18 @@ public class AccountsController {
         this.userService = userService;
     }
 
+    @ExceptionHandler(Exception.class)
+    public String handleInvalidUserException() {
+        log.warn("Something went wrong");
+        return "redirect:/error";
+    }
+
     /**
      * Method for handling get requests to /accounts/login page </br>
-     * Метод для обробки get запросів на сторінку accounts/login
      * @param error      optional query string for rendering page with error message </br>
      * @param logout     optional query string for rendering page with error logout message </br>
      * @param model      object for adding attributes for model and than put it in template html</br>
      * @return           html template</br>
-     *                   html шаблон
      * @see kpi.prject.testing.testing.entity.User
      * @see kpi.prject.testing.testing.service.UserService
      */
@@ -42,6 +48,7 @@ public class AccountsController {
         model.addAttribute("logout", logout != null);
         return "accounts/login";
     }
+
     @GetMapping(value = "/registration")
     public String getRegistrationFrom(@ModelAttribute("user") UserDTO user){
         return "accounts/registration";

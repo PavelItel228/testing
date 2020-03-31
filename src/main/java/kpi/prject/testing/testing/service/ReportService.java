@@ -8,6 +8,7 @@ import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import kpi.prject.testing.testing.entity.enums.Role;
 import kpi.prject.testing.testing.repository.ReportsRepository;
 import kpi.prject.testing.testing.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,10 +26,12 @@ public class ReportService {
 
     private final ReportsRepository reportsRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
-    public ReportService(ReportsRepository reportsRepository, UserRepository userRepository) {
+    public ReportService(ReportsRepository reportsRepository, UserRepository userRepository, ModelMapper modelMapper) {
         this.reportsRepository = reportsRepository;
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     public Page<Report> getAllByUser(User user, Pageable pageable) {
@@ -40,20 +43,19 @@ public class ReportService {
     }
 
     public Report getFromDTO(ReportDTO reportDTO) {
-        return Report.builder().name(reportDTO.getName()).description(reportDTO.getDescription()).build();
+        return modelMapper.map(reportDTO, Report.class);
     }
 
     @Transactional
     public void save(Report report, User owner) {
         report.setStatus(ReportStatus.QUEUE);
         report.setUser(owner);
-        List<User> inspectors = userRepository.findAllByRole(Role.ROLE_INSPECTOR).orElse(new ArrayList<>());
+        List<User> inspectors = getInscpectors();
         report.setInspector(getRandomElement(inspectors));
         reportsRepository.save(report);
     }
 
-    private static User getRandomElement(List<User> list)
-    {
+    private static User getRandomElement(List<User> list) {
         Random rand = new Random();
         return list.get(rand.nextInt(list.size()));
     }
@@ -80,12 +82,15 @@ public class ReportService {
         reportsRepository.save(report);
     }
 
-    @Transactional
     public void changeInspector(Report report) {
-        List<User> inspectors = userRepository.findAllByRole(Role.ROLE_INSPECTOR).orElse(new ArrayList<>());
+        List<User> inspectors = getInscpectors();
         inspectors.remove(report.getInspector());
         report.setStatus(ReportStatus.QUEUE);
         report.setInspector(getRandomElement(inspectors));
         reportsRepository.save(report);
+    }
+
+    private List<User> getInscpectors() {
+        return userRepository.findAllByRole(Role.ROLE_INSPECTOR).orElse(new ArrayList<>());
     }
 }
