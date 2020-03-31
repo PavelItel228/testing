@@ -60,7 +60,6 @@ public class UserService implements UserDetailsService {
             result.rejectValue("email", "3", "login or email is already taken");
             throw new UserExistsException(user.getUsername());
         }
-
     }
 
     public User getFromDto(UserDTO user) {

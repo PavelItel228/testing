@@ -24,7 +24,6 @@ public class NewUserValidator implements Validator {
     public void validate(Object target, Errors errors) {
         User user = (User) target;
         Locale locale = LocaleContextHolder.getLocale();
-        System.out.println(locale);
         if(user.getPassword().length() < 8) {
             errors.rejectValue("password", "1", "password must contain at least 8 characters");
             return;

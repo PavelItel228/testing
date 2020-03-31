@@ -2,6 +2,8 @@ package kpi.prject.testing.testing.service;
 
 import kpi.prject.testing.testing.dto.DeclineReasonDTO;
 import kpi.prject.testing.testing.dto.ReportDTO;
+import kpi.prject.testing.testing.dto.ReportForInspectorReportTableDTO;
+import kpi.prject.testing.testing.dto.ReportForUserReportTableDTO;
 import kpi.prject.testing.testing.entity.Report;
 import kpi.prject.testing.testing.entity.User;
 import kpi.prject.testing.testing.entity.enums.ReportStatus;
@@ -9,6 +11,7 @@ import kpi.prject.testing.testing.entity.enums.Role;
 import kpi.prject.testing.testing.repository.ReportsRepository;
 import kpi.prject.testing.testing.repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +38,18 @@ public class ReportService {
         this.modelMapper = modelMapper;
     }
 
-    public Page<Report> getAllByUser(User user, Pageable pageable) {
-        return reportsRepository.findByUser(user, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+    public Page<ReportForUserReportTableDTO> getAllByUserForUserTable(User user, Pageable pageable) {
+        Page<Report> reports = reportsRepository.findByUser(user, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+        Type pageType = new TypeToken<Page<ReportForUserReportTableDTO>>() {}.getType();
+        return modelMapper.map(reports, pageType);
     }
 
-    public Page<Report> getAllByInspectorAndStatus(User user, ReportStatus status, Pageable pageable) {
-        return reportsRepository.findAllByInspectorAndStatus(user, status, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+
+
+    public Page<ReportForInspectorReportTableDTO> getAllByInspectorAndStatusForTable(User user, ReportStatus status, Pageable pageable) {
+        Page<Report> reports = reportsRepository.findAllByInspectorAndStatus(user, status, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+        Type pageType = new TypeToken<Page<ReportForInspectorReportTableDTO>>() {}.getType();
+        return modelMapper.map(reports, pageType);
     }
 
     public Report getFromDTO(ReportDTO reportDTO) {
@@ -92,5 +102,11 @@ public class ReportService {
 
     private List<User> getInscpectors() {
         return userRepository.findAllByRole(Role.ROLE_INSPECTOR).orElse(new ArrayList<>());
+    }
+
+    public Optional<ReportDTO> getDTOById(long id) {
+        Optional<Report> report = reportsRepository.findById(id);
+        Type optionalReportType = new TypeToken<Optional<ReportDTO>>() {}.getType();
+        return modelMapper.map(report, optionalReportType);
     }
 }

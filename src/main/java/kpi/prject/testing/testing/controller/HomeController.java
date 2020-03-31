@@ -8,9 +8,11 @@ import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import kpi.prject.testing.testing.entity.enums.Role;
 import kpi.prject.testing.testing.exceptions.InvalidUserException;
 import kpi.prject.testing.testing.exceptions.UnknownReportError;
+import kpi.prject.testing.testing.exceptions.UnknownUserException;
 import kpi.prject.testing.testing.service.ReportService;
 import kpi.prject.testing.testing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -45,6 +47,12 @@ public class HomeController {
         return "redirect:/error";
     }
 
+    @ExceptionHandler(UnknownUserException.class)
+    public String handleUnknownUserException() {
+        log.warn("Requested unknown user");
+        return "redirect:/error";
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleAllException() {
         log.warn("Something went wrong");
@@ -57,11 +65,11 @@ public class HomeController {
         User user = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
         if (user.getRole() == Role.ROLE_USER) {
             model.addAttribute("username", principal.getName());
-            model.addAttribute("reports", reportService.getAllByUser(user, pageable));
+            model.addAttribute("reports", reportService.getAllByUserForUserTable(user, pageable));
             return "home/userHome";
         } else if (user.getRole() == Role.ROLE_INSPECTOR) {
             model.addAttribute("username", principal.getName());
-            model.addAttribute("reports", reportService.getAllByInspectorAndStatus(user, ReportStatus.QUEUE, pageable));
+            model.addAttribute("reports", reportService.getAllByInspectorAndStatusForTable(user, ReportStatus.QUEUE, pageable));
             return "home/inspHome";
         }
         return "redirect:/";
@@ -74,9 +82,9 @@ public class HomeController {
     }
 
     @PostMapping("/add")
-    public String postAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) {
+    public String postAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) throws UnknownUserException {
         model.addAttribute("username", principal.getName());
-        User user = userService.getByUsername(principal.getName()).orElse(new User());
+        User user = userService.getByUsername(principal.getName()).orElseThrow(UnknownUserException::new);
         reportService.save(reportService.getFromDTO(report), user);
         return "redirect:/home";
     }
@@ -113,7 +121,7 @@ public class HomeController {
     public String updateReport(@ModelAttribute("report") ReportDTO report, @PathVariable String report_id,
                                Model model,
                                Principal principal) throws UnknownReportError {
-        Report reportToUpdate = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        ReportDTO reportToUpdate = reportService.getDTOById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
         model.addAttribute("report", reportToUpdate);
         model.addAttribute("username", principal.getName());
         return "home/updateReport";
