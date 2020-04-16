@@ -12,7 +12,6 @@ import kpi.prject.testing.testing.repository.ReportsRepository;
 import kpi.prject.testing.testing.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +19,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -47,7 +44,8 @@ public class ReportService {
 
 
     public Page<ReportForInspectorReportTableDTO> getAllByInspectorAndStatusForTable(User user, ReportStatus status, Pageable pageable) {
-        Page<Report> reports = reportsRepository.findAllByInspectorAndStatus(user, status, pageable).orElse(new PageImpl<>(new ArrayList<>()));
+        Page<Report> reports = reportsRepository.findAllByInspectorsAndStatus(user,
+                status, pageable);
         Type pageType = new TypeToken<Page<ReportForInspectorReportTableDTO>>() {}.getType();
         return modelMapper.map(reports, pageType);
     }
@@ -61,13 +59,15 @@ public class ReportService {
         report.setStatus(ReportStatus.QUEUE);
         report.setUser(owner);
         List<User> inspectors = getInscpectors();
-        report.setInspector(getRandomElement(inspectors));
+        report.setInspectors(getRandomElements(inspectors));
+        System.out.println(report);
         reportsRepository.save(report);
     }
 
-    private static User getRandomElement(List<User> list) {
-        Random rand = new Random();
-        return list.get(rand.nextInt(list.size()));
+    private static List<User> getRandomElements(List<User> list) {
+        Collections.shuffle(list);
+        int listSizeIndex = 2;
+        return list.subList(0, listSizeIndex);
     }
 
     public Optional<Report> getById(long id) {
@@ -76,6 +76,7 @@ public class ReportService {
 
     public void acceptReport(Report report) {
         report.setStatus(ReportStatus.ACCEPTED);
+        report.setInspectors(new ArrayList<>());
         reportsRepository.save(report);
     }
 
@@ -91,12 +92,13 @@ public class ReportService {
         report.setStatus(ReportStatus.QUEUE);
         reportsRepository.save(report);
     }
-
+    @Transactional
     public void changeInspector(Report report) {
-        List<User> inspectors = getInscpectors();
-        inspectors.remove(report.getInspector());
+        List<User> inspectors = report.getInspectors();
+        //todo
+        inspectors.remove(report.getInspectors());
         report.setStatus(ReportStatus.QUEUE);
-        report.setInspector(getRandomElement(inspectors));
+        report.setInspectors(getRandomElements(inspectors));
         reportsRepository.save(report);
     }
 

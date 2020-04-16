@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@SuppressWarnings("SpringMVCViewInspection")
 @Controller
 @Slf4j
 @RequestMapping("/home")
@@ -53,11 +52,11 @@ public class HomeController {
         return "redirect:/error";
     }
 
-    @ExceptionHandler(Exception.class)
-    public String handleAllException() {
-        log.warn("Something went wrong");
-        return "redirect:/error";
-    }
+//    @ExceptionHandler(Exception.class)
+//    public String handleAllException() {
+//        log.warn("Something went wrong");
+//        return "redirect:/error";
+//    }
 
     @GetMapping("")
     public String getHome(Model model, Principal principal, @PageableDefault(sort = {"updated", "id"},

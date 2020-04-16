@@ -8,10 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ReportsRepository extends JpaRepository<Report, Long> {
     Optional<Page<Report>> findByUser(User user , Pageable page);
-    Optional<Page<Report>> findAllByInspectorAndStatus(User inspector, ReportStatus status, Pageable page);
+    Page<Report> findAllByInspectorsAndStatus(User inspector, ReportStatus status, Pageable pageable);
 }

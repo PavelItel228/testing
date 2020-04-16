@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,10 +41,11 @@ public class Report {
     @JsonBackReference
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "inspector_id")
-    @JsonBackReference
-    private User inspector;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "report_inspectors",
+                joinColumns = {@JoinColumn(name = "usr_id")},
+                inverseJoinColumns = {@JoinColumn(name = "report_id")})
+    private List<User> inspectors;
 
 
     @CreationTimestamp
@@ -56,4 +58,7 @@ public class Report {
 
     @Column(name = "decline_reason", columnDefinition = "TEXT")
     private String reason;
+
+    @OneToMany(mappedBy = "report")
+    private List<Archive> archive;
 }

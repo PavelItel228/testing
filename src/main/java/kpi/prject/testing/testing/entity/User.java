@@ -47,7 +47,7 @@ public class User implements UserDetails {
     @Column(name = "updated", nullable = false)
     private LocalDate updated;
 
-    @OneToMany(mappedBy = "user")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "inspectors")
     @JsonManagedReference
     private List<Report> reports;
 
@@ -59,6 +59,7 @@ public class User implements UserDetails {
 
     @Transient
     private String confirmPassword;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
