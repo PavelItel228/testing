@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Title</title>
+</head>
+<body>
+<div id="searchForm" class="input-group form-inline mr-auto mb-4 d-flex justify-content-end" th:fragment="search">
+    <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1" th:text="#{string.name}"></span>
+    </div>
+    <input id="searchString" aria-describedby="basic-addon1" class="form-control mr-sm-2" type="text"
+           th:placeholder="#{string.search}" th:aria-label="#{string.search}">
+    <a id="searchButton">
+        <div class="input-group-append">
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    onclick="searchSubmit()" th:text="#{string.search}">
+            </button>
+        </div>
+    </a>
+</div>
+</body>
+</html>

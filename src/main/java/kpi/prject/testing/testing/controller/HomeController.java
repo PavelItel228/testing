@@ -12,7 +12,6 @@ import kpi.prject.testing.testing.exceptions.UnknownUserException;
 import kpi.prject.testing.testing.service.ReportService;
 import kpi.prject.testing.testing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -59,77 +59,71 @@ public class HomeController {
 //    }
 
     @GetMapping("")
-    public String getHome(Model model, Principal principal, @PageableDefault(sort = {"updated", "id"},
+    public String getHome(@RequestParam(required = false) String search, Model model, Principal principal, @PageableDefault(sort = {"updated", "id"},
             direction = Sort.Direction.DESC, size = 12) Pageable pageable) throws InvalidUserException {
+
         User user = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        String searchString = Optional.ofNullable(search).orElse("");
         if (user.getRole() == Role.ROLE_USER) {
-            model.addAttribute("username", principal.getName());
-            model.addAttribute("reports", reportService.getAllByUserForUserTable(user, pageable));
+            model.addAttribute("reports", reportService.getAllByUserForUserTable(user, pageable, searchString));
             return "home/userHome";
         } else if (user.getRole() == Role.ROLE_INSPECTOR) {
-            model.addAttribute("username", principal.getName());
-            model.addAttribute("reports", reportService.getAllByInspectorAndStatusForTable(user, ReportStatus.QUEUE, pageable));
+            model.addAttribute("reports", reportService.getAllByInspectorAndStatusForTable(user, ReportStatus.QUEUE, pageable, searchString));
             return "home/inspHome";
         }
         return "redirect:/";
     }
 
         @GetMapping("/add")
-    public String getAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) {
-        model.addAttribute("username", principal.getName());
+    public String getAdd(@ModelAttribute("report") ReportDTO report) {
         return "home/addReport";
     }
 
     @PostMapping("/add")
-    public String postAdd(@ModelAttribute("report") ReportDTO report, Model model, Principal principal) throws UnknownUserException {
-        model.addAttribute("username", principal.getName());
+    public String postAdd(@ModelAttribute("report") ReportDTO report, Principal principal) throws UnknownUserException {
         User user = userService.getByUsername(principal.getName()).orElseThrow(UnknownUserException::new);
         reportService.save(reportService.getFromDTO(report), user);
         return "redirect:/home";
     }
 
     @PostMapping(value = "/accept/{report_id}")
-    public String acceptReport(@PathVariable String report_id) throws UnknownReportError {
+    public String acceptReport(@PathVariable String report_id, Principal principal)
+            throws UnknownReportError, InvalidUserException {
+        User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
         Report reportToAccept = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        reportService.acceptReport(reportToAccept);
+        reportService.acceptReport(reportToAccept, inspector);
         return "redirect:/home";
     }
 
     @GetMapping(value = "/decline/{report_id}")
     public String declineReport(@ModelAttribute("report_reason") DeclineReasonDTO reportReason,
                                 @PathVariable String report_id,
-                                Model model,
-                                Principal principal) throws UnknownReportError {
-        Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        model.addAttribute("username", principal.getName());
+                                Model model) {
         model.addAttribute("report_id", report_id);
         return "home/addReason";
     }
 
     @PostMapping(value = "/decline/{report_id}")
-    public String declineReportPost(@ModelAttribute("report_reason") DeclineReasonDTO reportReason, @PathVariable String report_id,
-                                    Model model,
-                                    Principal principal) throws UnknownReportError {
+    public String declineReportPost(@ModelAttribute("report_reason") DeclineReasonDTO reportReason,
+                                    @PathVariable String report_id, Principal principal) throws UnknownReportError, InvalidUserException {
         Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        model.addAttribute("username", principal.getName());
-        reportService.declineReport(reportToDecline, reportReason);
+        User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        reportService.declineReport(reportToDecline, reportReason, inspector);
         return "redirect:/home";
     }
 
     @GetMapping(value = "/update/{report_id}")
-    public String updateReport(@ModelAttribute("report") ReportDTO report, @PathVariable String report_id,
-                               Model model,
-                               Principal principal) throws UnknownReportError {
-        ReportDTO reportToUpdate = reportService.getDTOById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        model.addAttribute("report", reportToUpdate);
-        model.addAttribute("username", principal.getName());
+    public String updateReport(@PathVariable String report_id,
+                               Model model) throws UnknownReportError {
+        Report report = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        model.addAttribute("report", report);
         return "home/updateReport";
     }
 
     @PostMapping(value = "/update/{report_id}")
-    public String updateReportPost(@ModelAttribute("report") ReportDTO report, @PathVariable String report_id) throws UnknownReportError {
-        Report reportToUpdate = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        reportService.update(reportToUpdate, report);
+    public String updateReportPost(@ModelAttribute("reportToUpdate") ReportDTO reportToUpdate, @PathVariable String report_id) throws UnknownReportError {
+        Report report = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        reportService.update(report, reportToUpdate);
         return "redirect:/home";
     }
 

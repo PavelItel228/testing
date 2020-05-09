@@ -29,8 +29,7 @@ public class IndexTest {
     @WithUserDetails("user@gmail.com")
     public void getIndexPage() throws Exception {
         this.mockMvc.perform(get("/"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("user")));
+                .andExpect(status().isOk());
     }
 
     @Test

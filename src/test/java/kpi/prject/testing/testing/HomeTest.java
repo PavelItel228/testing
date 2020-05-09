@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-@Sql(value = {"/create_user_before.sql", "/create_report_before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = {"/create_user_before.sql", "/create_report_before.sql", "/create_archive_before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class HomeTest {
 
@@ -72,6 +72,7 @@ public class HomeTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is3xxRedirection());
+        Assert.assertNotNull(reportsRepository.findByName("added").orElse(null));
 
         this.mockMvc.perform(get("/home"))
                 .andExpect(status().isOk())
@@ -90,6 +91,7 @@ public class HomeTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is3xxRedirection());
+        Assert.assertEquals("updated", reportsRepository.findById(2L).get().getName());
 
         this.mockMvc.perform(get("/home"))
                 .andExpect(status().isOk())
@@ -104,7 +106,8 @@ public class HomeTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is3xxRedirection());
-        //Assert.assertEquals((long) reportsRepository.findById(3L).get().getInspector().getId(), 3L);
+        Assert.assertEquals(0, reportsRepository.findById(3L).get().getInspectors().stream()
+                .filter(inspector -> inspector.getId().equals(2L)).count());;
     }
 
     @Test

@@ -27,7 +27,7 @@ import java.util.Set;
 @Table(name = "usr")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "username", nullable = false,unique = true)
@@ -47,9 +47,11 @@ public class User implements UserDetails {
     @Column(name = "updated", nullable = false)
     private LocalDate updated;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
+    private List<Report> reportsOwned;
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "inspectors")
-    @JsonManagedReference
-    private List<Report> reports;
+    private List<Report> reportsInspected;
 
     @Enumerated(EnumType.STRING)
     private Status status;

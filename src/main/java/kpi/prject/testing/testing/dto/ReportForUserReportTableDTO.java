@@ -22,5 +22,5 @@ public class ReportForUserReportTableDTO {
     @NotNull
     private LocalDate updated;
     @NotNull
-    private String reason;
+    private String declineReason;
 }

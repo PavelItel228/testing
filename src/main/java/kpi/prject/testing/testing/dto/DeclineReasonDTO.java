@@ -9,5 +9,5 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class DeclineReasonDTO {
     @NotNull
-    private String reason;
+    private String declineReason;
 }

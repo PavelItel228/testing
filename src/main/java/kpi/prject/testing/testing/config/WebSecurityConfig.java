@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -42,14 +43,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/","/js/**", "/img/**", "/accounts/login", "/css/*", "/accounts/registration").permitAll()
+                .antMatchers("/","/js/*", "/img/**", "/accounts/login", "/css/*", "/accounts/registration").permitAll()
                 .antMatchers("/home/accept/*", "home/decline/*").hasAuthority("ROLE_INSPECTOR")
                 .antMatchers("/home/add").hasAuthority("ROLE_USER")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedPage("/denied")
                 .and()
-                .formLogin().loginPage("/accounts/login").failureUrl("/accounts/login?error=true")
+                .formLogin().loginPage("/accounts/login").failureUrl("/accounts/login?error=true").successHandler(loginSuccessHandler())
         .permitAll()
                 .and()
                 .logout().deleteCookies("JSESSIONID").logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll()
@@ -61,6 +62,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler loginSuccessHandler() {
+        return new LoginSuccessHandler();
     }
 
 

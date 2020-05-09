@@ -1,8 +1,12 @@
 package kpi.prject.testing.testing.entity;
 
+import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -14,7 +18,7 @@ import javax.persistence.*;
 @Table(name = "archive")
 public class Archive {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -22,4 +26,24 @@ public class Archive {
 
     @ManyToOne
     private Report report;
+
+    @Column(name="name")
+    private String name;
+
+    @Column(name="description")
+    private String description;
+
+    @Column(name="decline_reason")
+    private String declineReason;
+
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created", nullable = false)
+    private LocalDate created;
+
+    @UpdateTimestamp
+    @Column(name = "updated", nullable = false)
+    private LocalDate updated;
 }

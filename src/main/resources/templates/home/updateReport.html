@@ -15,20 +15,20 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <div class="content">
-    <h3 th:text="#{string.reason.toggle} + ${report.getReason()}"></h3>
+    <h3 th:text="#{string.reason.toggle} + ${report.getDeclineReason()}"></h3>
     <hr/>
     <h1 th:text="#{string.update.title}"></h1>
-    <form th:object="${report}" method="post" th:action="@{'/home/update/' + ${report.getId()}}">
+    <form method="post" th:action="@{'/home/update/' + ${report.getId()}}">
 
         <div class="form-group">
             <label for="name" th:text="#{string.name}"></label>
-            <input th:field="*{name}" type="text" required class="form-control" id="name"
+            <input name = "name" type="text" required class="form-control" id="name"
                    aria-describedby="username" th:placeholder="#{string.name}" th:value="${report.getName()}">
         </div>
         <div class="form-group">
             <label for="description" th:text="#{string.description}"></label>
-            <input th:field="*{description}" type="text" required class="form-control" aria-describedby="description"
-                   th:placeholder="#{string.description}" id="description" th:value="${report.getDescription()}">
+            <input name="description" id ="description" type="text" required class="form-control" aria-describedby="description"
+                   th:placeholder="#{string.description}" th:value="${report.getDescription()}">
         </div>
         <button type="submit" class="btn btn-primary" th:text="#{string.submit}"></button>
     </form>

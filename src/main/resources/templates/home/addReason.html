@@ -21,9 +21,9 @@
     <form th:object="${report_reason}" method="post" th:action="@{'/home/decline/' + ${report_id}}">
 
         <div class="form-group">
-            <label for="reason" th:text="#{string.reason}"></label>
-            <input th:field="*{reason}" type="text" required class="form-control" id="reason"
-                   aria-describedby="reason" th:placeholder="#{string.reason}">
+            <label for="declineReason" th:text="#{string.reason}"></label>
+            <input th:field="*{declineReason}" type="text" required class="form-control" id="declineReason"
+                   aria-describedby="declineReason" th:placeholder="#{string.reason}">
         </div>
         <button type="submit" class="btn btn-primary" th:text="#{string.submit}"></button>
     </form>

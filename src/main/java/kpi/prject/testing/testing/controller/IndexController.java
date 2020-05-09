@@ -11,9 +11,7 @@ import java.security.Principal;
 public class IndexController {
 
     @RequestMapping("/")
-    public String getIndex(Principal principal, Model model){
-        final String currentUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-        model.addAttribute("username", currentUserName);
+    public String getIndex(){
         return "index";
     }
 }

@@ -20,7 +20,7 @@
         </ul>
         <div class="form-inline my-2 my-lg-0">
             <div sec:authorize="isAuthenticated()">
-                <span class="nav-text"><a href="#" th:text="${username}"></a></span>
+                <span class="nav-text"><a href="#" th:text="${session.username}"></a></span>
                 <span>|</span>
                 <span class="nav-text"><a href="/logout" th:text="#{string.logout}"></a></span>
             </div>

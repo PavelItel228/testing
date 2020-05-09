@@ -24,7 +24,7 @@ import java.util.List;
 public class Report {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -37,14 +37,12 @@ public class Report {
     private ReportStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "usr_id")
-    @JsonBackReference
-    private User user;
+    private User owner;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "report_inspectors",
-                joinColumns = {@JoinColumn(name = "usr_id")},
-                inverseJoinColumns = {@JoinColumn(name = "report_id")})
+                joinColumns = {@JoinColumn(name = "report_id")},
+                inverseJoinColumns = {@JoinColumn(name = "usr_id")})
     private List<User> inspectors;
 
 
@@ -57,8 +55,8 @@ public class Report {
     private LocalDate updated;
 
     @Column(name = "decline_reason", columnDefinition = "TEXT")
-    private String reason;
+    private String declineReason;
 
     @OneToMany(mappedBy = "report")
-    private List<Archive> archive;
+    private List<Archive> archives;
 }
