@@ -18,7 +18,7 @@
     <h3 th:text="#{string.reason.toggle} + ${report.getDeclineReason()}"></h3>
     <hr/>
     <h1 th:text="#{string.update.title}"></h1>
-    <form method="post" th:action="@{'/home/update/' + ${report.getId()}}">
+    <form method="post" th:action="@{'/userHome/update/' + ${report.getId()}}">
 
         <div class="form-group">
             <label for="name" th:text="#{string.name}"></label>

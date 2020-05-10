@@ -1,6 +1,5 @@
 package kpi.prject.testing.testing;
 
-import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import kpi.prject.testing.testing.repository.ReportsRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -12,26 +11,24 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @Sql(value = {"/create_user_before.sql", "/create_report_before.sql", "/create_archive_before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class HomeTest {
+public class UserHomeTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +37,7 @@ public class HomeTest {
 
     @Test
     public void getHomeUnauthorized() throws Exception {
-        this.mockMvc.perform(get("/home"))
+        this.mockMvc.perform(get("/userHome"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost/accounts/login"));
     }
@@ -48,22 +45,29 @@ public class HomeTest {
     @Test
     @WithUserDetails("user@gmail.com")
     public void getHomeUser() throws Exception {
-        this.mockMvc.perform(get("/home"))
+        this.mockMvc.perform(get("/userHome"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Queue")));
     }
 
     @Test
+    @WithUserDetails("admin@gmail.com")
+    public void getHomeAdmin() throws Exception {
+        this.mockMvc.perform(get("/userHome"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     @WithUserDetails("user@gmail.com")
     public void getHomeAdd() throws Exception {
-        this.mockMvc.perform(get("/home/add"))
+        this.mockMvc.perform(get("/userHome/add"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithUserDetails("user@gmail.com")
     public void addReportPost () throws Exception {
-        this.mockMvc.perform(post("/home/add")
+        this.mockMvc.perform(post("/userHome/add")
                 .with(csrf().asHeader())
                 .content(buildUrlEncodedFormEntity(
                         "name", "added",
@@ -74,7 +78,7 @@ public class HomeTest {
                 .andExpect(status().is3xxRedirection());
         Assert.assertNotNull(reportsRepository.findByName("added").orElse(null));
 
-        this.mockMvc.perform(get("/home"))
+        this.mockMvc.perform(get("/userHome"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("added")));
     }
@@ -82,7 +86,7 @@ public class HomeTest {
     @Test
     @WithUserDetails("user@gmail.com")
     public void updateReportPosrt () throws Exception {
-        this.mockMvc.perform(post("/home/update/2")
+        this.mockMvc.perform(post("/userHome/update/2")
                 .with(csrf().asHeader())
                 .content(buildUrlEncodedFormEntity(
                         "name", "updated",
@@ -93,7 +97,7 @@ public class HomeTest {
                 .andExpect(status().is3xxRedirection());
         Assert.assertEquals("updated", reportsRepository.findById(2L).get().getName());
 
-        this.mockMvc.perform(get("/home"))
+        this.mockMvc.perform(get("/userHome"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("updated")));
     }
@@ -101,7 +105,7 @@ public class HomeTest {
     @Test
     @WithUserDetails("user@gmail.com")
     public void postChange () throws Exception {
-        this.mockMvc.perform(post("/home/change/3")
+        this.mockMvc.perform(post("/userHome/change/3")
                 .with(csrf().asHeader())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON))
@@ -110,19 +114,6 @@ public class HomeTest {
                 .filter(inspector -> inspector.getId().equals(2L)).count());;
     }
 
-    @Test
-    @WithUserDetails("admin@gmail.com")
-    public void declinePost () throws Exception {
-        this.mockMvc.perform(post("/home/decline/1")
-                .with(csrf().asHeader())
-                .content(buildUrlEncodedFormEntity(
-                        "reason", "reason"
-                ))
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is3xxRedirection());
-        Assert.assertEquals(ReportStatus.NOT_ACCEPTED, reportsRepository.findById(1L).get().getStatus());
-    }
 
     private String buildUrlEncodedFormEntity(String... params) {
         if( (params.length % 2) > 0 ) {

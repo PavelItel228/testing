@@ -18,7 +18,7 @@
 
 <div class="content">
     <h1 th:text="#{string.decline.reason}"></h1>
-    <form th:object="${report_reason}" method="post" th:action="@{'/home/decline/' + ${report_id}}">
+    <form th:object="${report_reason}" method="post" th:action="@{'/inspHome/decline/' + ${report_id}}">
 
         <div class="form-group">
             <label for="declineReason" th:text="#{string.reason}"></label>

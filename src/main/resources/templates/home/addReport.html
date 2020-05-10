@@ -15,7 +15,7 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <div class="content">
-    <form th:object="${report}" method="post" th:action="@{'/home/add'}">
+    <form th:object="${report}" method="post" th:action="@{'/userHome/add'}">
 
         <div class="form-group">
             <label for="name" th:text="#{string.name}"></label>

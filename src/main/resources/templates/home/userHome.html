@@ -49,13 +49,13 @@
             <td th:text="${report.getUpdated()}"></td>
             <div style="display:inline" th:with="declined = ${report.getStatus().name() == 'NOT_ACCEPTED'}">
                 <td th:if="${declined}">
-                    <form th:action="@{'home/update/' + ${report.getId()}}" th:method="get">
+                    <form th:action="@{'userHome/update/' + ${report.getId()}}" th:method="get">
                     <button type="submit" class="btn btn-warning"
                             onclick="return confirm('You sure?')" th:text="#{string.correct}"></button>
                 </form>
                 </td>
                 <td th:if="${declined}">
-                    <form th:action="@{'home/change/' + ${report.getId()}}" th:method="post">
+                    <form th:action="@{'userHome/change/' + ${report.getId()}}" th:method="post">
                     <button type="submit" class="btn btn-danger"
                             onclick="return confirm('You sure?')" th:text="#{string.replace}"></button>
                 </form>
@@ -76,7 +76,7 @@
     </span>
         <tbody>
     </table>
-    <a th:href="@{/home/add}">
+    <a th:href="@{/userHome/add}">
         <button type="button" class="btn btn-outline-success btn-lg" th:text="#{string.add}">
         </button>
     </a>

@@ -43,13 +43,13 @@
             <td th:text="${report.getCreated()}"></td>
             <td th:text="${report.getUpdated()}"></td>
             <td>
-                <form th:action="@{'home/accept/' + ${report.getId()}}" th:method="post">
+                <form th:action="@{'inspHome/accept/' + ${report.getId()}}" th:method="post">
                     <button type="submit" class="btn btn-success" onclick="return confirm('You sure?')"
                             th:text="#{string.accept}"></button>
                 </form>
             </td>
             <td>
-            <form th:action="@{'home/decline/' + ${report.getId()}}" th:method="get">
+            <form th:action="@{'inspHome/decline/' + ${report.getId()}}" th:method="get">
                 <button type="submit" class="btn btn-danger"
                         onclick="return confirm('You sure?')" th:text="#{string.decline}"></button>
             </form>
