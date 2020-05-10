@@ -4,9 +4,9 @@ import kpi.prject.testing.testing.dto.DeclineReasonDTO;
 import kpi.prject.testing.testing.entity.Report;
 import kpi.prject.testing.testing.entity.User;
 import kpi.prject.testing.testing.entity.enums.ReportStatus;
-import kpi.prject.testing.testing.entity.enums.Role;
 import kpi.prject.testing.testing.exceptions.InvalidUserException;
 import kpi.prject.testing.testing.exceptions.UnknownReportError;
+import kpi.prject.testing.testing.service.InspectorService;
 import kpi.prject.testing.testing.service.ReportService;
 import kpi.prject.testing.testing.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +27,12 @@ public class InspHomeController {
 
     private final UserService userService;
     private final ReportService reportService;
+    private final InspectorService inspectorService;
 
-    public InspHomeController(UserService userService, ReportService reportService) {
+    public InspHomeController(UserService userService, ReportService reportService, InspectorService inspectorService) {
         this.userService = userService;
         this.reportService = reportService;
+        this.inspectorService = inspectorService;
     }
 
     @ExceptionHandler(InvalidUserException.class)
@@ -61,7 +63,7 @@ public class InspHomeController {
                                     @PathVariable String report_id, Principal principal) throws UnknownReportError, InvalidUserException {
         Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
         User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
-        reportService.declineReport(reportToDecline, reportReason, inspector);
+        inspectorService.declineReport(reportToDecline, reportReason, inspector);
         return "redirect:/inspHome";
     }
 
@@ -70,7 +72,7 @@ public class InspHomeController {
             throws UnknownReportError, InvalidUserException {
         User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
         Report reportToAccept = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
-        reportService.acceptReport(reportToAccept, inspector);
+        inspectorService.acceptReport(reportToAccept, inspector);
         return "redirect:/inspHome";
     }
 
