@@ -85,8 +85,8 @@ public class UserHomeTest {
 
     @Test
     @WithUserDetails("user@gmail.com")
-    public void updateReportPosrt () throws Exception {
-        this.mockMvc.perform(post("/userHome/update/2")
+    public void updateReportPost () throws Exception {
+        this.mockMvc.perform(post("/userHome/update/3")
                 .with(csrf().asHeader())
                 .content(buildUrlEncodedFormEntity(
                         "name", "updated",
@@ -95,7 +95,7 @@ public class UserHomeTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is3xxRedirection());
-        Assert.assertEquals("updated", reportsRepository.findById(2L).get().getName());
+        Assert.assertEquals("updated", reportsRepository.findById(3L).get().getName());
 
         this.mockMvc.perform(get("/userHome"))
                 .andExpect(status().isOk())

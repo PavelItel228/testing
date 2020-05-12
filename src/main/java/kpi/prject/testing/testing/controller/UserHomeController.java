@@ -3,6 +3,7 @@ package kpi.prject.testing.testing.controller;
 import kpi.prject.testing.testing.dto.ReportDTO;
 import kpi.prject.testing.testing.entity.Report;
 import kpi.prject.testing.testing.entity.User;
+import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import kpi.prject.testing.testing.exceptions.InvalidUserException;
 import kpi.prject.testing.testing.exceptions.UnknownReportError;
 import kpi.prject.testing.testing.exceptions.UnknownUserException;
@@ -70,22 +71,42 @@ public class UserHomeController {
 
     @GetMapping(value = "/update/{report_id}")
     public String updateReport(@PathVariable String report_id,
-                               Model model) throws UnknownReportError {
+                               Model model, Principal principal) throws UnknownReportError, InvalidUserException {
         Report report = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        User user = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        if(user.getReportsOwned().stream().noneMatch(reportt -> reportt.getId().equals(report.getId()))
+                || !report.getStatus().equals(ReportStatus.NOT_ACCEPTED)){
+            log.warn("user is not allowed to update report");
+            return "redirect:/error";
+        }
         model.addAttribute("report", report);
         return "home/updateReport";
     }
 
     @PostMapping(value = "/update/{report_id}")
-    public String updateReportPost(@ModelAttribute("reportToUpdate") ReportDTO reportToUpdate, @PathVariable String report_id) throws UnknownReportError {
+    public String updateReportPost(@ModelAttribute("reportToUpdate") ReportDTO reportToUpdate,
+                                   @PathVariable String report_id, Principal principal)
+            throws UnknownReportError, InvalidUserException {
         Report report = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        User user = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        if(user.getReportsOwned().stream().noneMatch(reportt -> reportt.getId().equals(report.getId()))
+                || !report.getStatus().equals(ReportStatus.NOT_ACCEPTED)){
+            log.warn("user is not allowed to update report");
+            return "redirect:/error";
+        }
         ownerService.update(report, reportToUpdate);
         return "redirect:/userHome";
     }
 
     @PostMapping(value = "/change/{report_id}")
-    public String changeReportPost(@PathVariable String report_id) throws UnknownReportError {
+    public String changeReportPost(@PathVariable String report_id, Principal principal) throws UnknownReportError, InvalidUserException {
         Report reportToUpdate = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        User user = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        if(user.getReportsOwned().stream().noneMatch(reportt -> reportt.getId().equals(reportToUpdate.getId()))
+                || !reportToUpdate.getStatus().equals(ReportStatus.NOT_ACCEPTED)){
+            log.warn("user is not allowed to change inspector of this report");
+            return "redirect:/error";
+        }
         ownerService.changeInspector(reportToUpdate);
         return "redirect:/userHome";
     }

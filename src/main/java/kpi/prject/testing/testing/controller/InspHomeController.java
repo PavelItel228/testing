@@ -63,6 +63,11 @@ public class InspHomeController {
                                     @PathVariable String report_id, Principal principal) throws UnknownReportError, InvalidUserException {
         Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
         User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        if(inspector.getReportsInspected().stream().noneMatch(report -> report.getId().equals(reportToDecline.getId()))
+            || !reportToDecline.getStatus().equals(ReportStatus.QUEUE)){
+            log.warn("inspector is not allowed to decline this report");
+            return "redirect:/error";
+        }
         inspectorService.declineReport(reportToDecline, reportReason, inspector);
         return "redirect:/inspHome";
     }
@@ -72,6 +77,11 @@ public class InspHomeController {
             throws UnknownReportError, InvalidUserException {
         User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
         Report reportToAccept = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        if(inspector.getReportsInspected().stream().noneMatch(report -> report.getId().equals(reportToAccept.getId()))
+                || !reportToAccept.getStatus().equals(ReportStatus.QUEUE)){
+            log.warn("inspector is not allowed to accept this report");
+            return "redirect:/error";
+        }
         inspectorService.acceptReport(reportToAccept, inspector);
         return "redirect:/inspHome";
     }
@@ -79,7 +89,14 @@ public class InspHomeController {
     @GetMapping(value = "/decline/{report_id}")
     public String declineReport(@ModelAttribute("report_reason") DeclineReasonDTO reportReason,
                                 @PathVariable String report_id,
-                                Model model) {
+                                Model model, Principal principal) throws UnknownReportError, InvalidUserException {
+        User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
+        Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
+        if(inspector.getReportsInspected().stream().noneMatch(report -> report.getId().equals(reportToDecline.getId()))
+                || !reportToDecline.getStatus().equals(ReportStatus.QUEUE)){
+            log.warn("inspector is not allowed to decline this report");
+            return "redirect:/error";
+        }
         model.addAttribute("report_id", report_id);
         return "home/addReason";
     }
