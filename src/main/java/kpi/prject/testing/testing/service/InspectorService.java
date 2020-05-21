@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class InspectorService {
@@ -26,21 +27,18 @@ public class InspectorService {
 
     @Transactional
     public void acceptReport(Report report, User inspector) {
-        Archive archive = Archive.builder()
-                .report(report)
-                .inspectorDecision(inspector)
-                .name(report.getName())
-                .description(report.getDescription())
-                .status(ReportStatus.ACCEPTED)
-                .build();
-        archiveRepository.save(archive);
-        report.setStatus(ReportStatus.ACCEPTED);
-        report.setInspectors(new ArrayList<>());
+        archiveRepository.save(createArchive(report, inspector));
         reportsRepository.save(report);
     }
+    //todo
     @Transactional
     public void declineReport(Report reportToDecline, DeclineReasonDTO reportReason, User inspector) {
-        Archive archive = Archive.builder()
+        archiveRepository.save(createArchive(reportToDecline, reportReason, inspector));
+        reportsRepository.save(reportToDecline);
+    }
+
+    private Archive createArchive(Report reportToDecline, DeclineReasonDTO reportReason, User inspector){
+        return Archive.builder()
                 .report(reportToDecline)
                 .inspectorDecision(inspector)
                 .name(reportToDecline.getName())
@@ -48,9 +46,15 @@ public class InspectorService {
                 .declineReason(reportReason.getDeclineReason())
                 .status(ReportStatus.NOT_ACCEPTED)
                 .build();
-        archiveRepository.save(archive);
-        reportToDecline.setDeclineReason(reportReason.getDeclineReason());
-        reportToDecline.setStatus(ReportStatus.NOT_ACCEPTED);
-        reportsRepository.save(reportToDecline);
+    }
+
+    private Archive createArchive(Report reportToDecline, User inspector){
+        return Archive.builder()
+                .report(reportToDecline)
+                .inspectorDecision(inspector)
+                .name(reportToDecline.getName())
+                .description(reportToDecline.getDescription())
+                .status(ReportStatus.NOT_ACCEPTED)
+                .build();
     }
 }

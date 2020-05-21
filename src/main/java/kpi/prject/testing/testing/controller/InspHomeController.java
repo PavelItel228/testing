@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Slf4j
@@ -60,7 +61,8 @@ public class InspHomeController {
 
     @PostMapping(value = "/decline/{report_id}")
     public String declineReportPost(@ModelAttribute("report_reason") DeclineReasonDTO reportReason,
-                                    @PathVariable String report_id, Principal principal) throws UnknownReportError, InvalidUserException {
+                                    @PathVariable String report_id, Principal principal)
+            throws UnknownReportError, InvalidUserException {
         Report reportToDecline = reportService.getById(Long.parseLong(report_id)).orElseThrow(UnknownReportError::new);
         User inspector = userService.getByUsername(principal.getName()).orElseThrow(InvalidUserException::new);
         if(inspector.getReportsInspected().stream().noneMatch(report -> report.getId().equals(reportToDecline.getId()))
@@ -68,6 +70,8 @@ public class InspHomeController {
             log.warn("inspector is not allowed to decline this report");
             return "redirect:/error";
         }
+        reportToDecline.setDeclineReason(reportReason.getDeclineReason());
+        reportToDecline.setStatus(ReportStatus.NOT_ACCEPTED);
         inspectorService.declineReport(reportToDecline, reportReason, inspector);
         return "redirect:/inspHome";
     }
@@ -82,6 +86,8 @@ public class InspHomeController {
             log.warn("inspector is not allowed to accept this report");
             return "redirect:/error";
         }
+        reportToAccept.setStatus(ReportStatus.ACCEPTED);
+        reportToAccept.setInspectors(new ArrayList<>());
         inspectorService.acceptReport(reportToAccept, inspector);
         return "redirect:/inspHome";
     }
