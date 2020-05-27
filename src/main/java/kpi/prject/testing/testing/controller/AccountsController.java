@@ -31,6 +31,11 @@ public class AccountsController {
         return "redirect:/error";
     }
 
+    @GetMapping(value = "/reg")
+    public String getRegFrom(@ModelAttribute("user") UserDTO user){
+        return "reg";
+    }
+
     /**
      * Method for handling get requests to /accounts/login page </br>
      * @param error      optional query string for rendering page with error message </br>

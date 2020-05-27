@@ -1,5 +1,6 @@
 package kpi.prject.testing.testing.controller;
 
+import kpi.prject.testing.testing.dto.UserDTO;
 import kpi.prject.testing.testing.entity.User;
 import kpi.prject.testing.testing.entity.enums.ReportStatus;
 import kpi.prject.testing.testing.entity.enums.Role;
@@ -9,6 +10,8 @@ import kpi.prject.testing.testing.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
