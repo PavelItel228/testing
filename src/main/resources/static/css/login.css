@@ -36,7 +36,8 @@ body {
 .error {
     display:block;
     font-size : 13px;
-    color: #ed1327
+    color: #ed1327;
+    text-align: center;
 }
 
 #logout {
@@ -62,5 +63,11 @@ body {
     flex-shrink: 0;
     background:#eee;
     border:1px solid #ddd;
+}
+
+#lang{
+    display: flex;
+    align-items: center;
+    justify-content: center
 }
 

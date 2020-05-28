@@ -31,11 +31,6 @@ public class AccountsController {
         return "redirect:/error";
     }
 
-    @GetMapping(value = "/reg")
-    public String getRegFrom(@ModelAttribute("user") UserDTO user){
-        return "reg";
-    }
-
     /**
      * Method for handling get requests to /accounts/login page </br>
      * @param error      optional query string for rendering page with error message </br>
@@ -56,7 +51,7 @@ public class AccountsController {
 
     @GetMapping(value = "/registration")
     public String getRegistrationFrom(@ModelAttribute("user") UserDTO user){
-        return "accounts/registration";
+        return "reg";
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
@@ -65,7 +60,7 @@ public class AccountsController {
         try {
             userService.registration(userFromDto, result);
         } catch (UserExistsException | InvalidUserException e) {
-            return "accounts/registration";
+            return "reg";
         }
         return "redirect:/accounts/login";
     }
