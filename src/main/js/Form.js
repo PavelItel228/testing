@@ -14,37 +14,52 @@ export default class Form extends React.Component {
         hasErrors: true
     };
 
-    validate = () => {
+    isNumeric = n => {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    validate = (callback) => {
         let nameError = "";
         let emailError = "";
         let passwordError = "";
-        let confirmPasswordError = "";
-
-        if(this.state.password.length <= 8) {
+        let confirmedPasswordError = "";
+        let hasErrors;
+        const re = /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+        console.log(this.state.password.length)
+        if(this.isNumeric(this.state.password)){
+            passwordError = "password must contain letters";
+        }
+        if(this.state.password.length < 8) {
             passwordError = "password must contain at least 8 character's";
         }
-        if(emailError || nameError || passwordError || confirmPasswordError) {
-            this.setState({emailError, nameError, passwordError, confirmPasswordError});
-            return false;
+        if(!re.test(this.state.email.toLowerCase())){
+            emailError = "invalid email"
         }
-        this.setState({emailError, nameError, passwordError, confirmPasswordError});
-        return true;
+        if(this.state.password !== this.state.confirmPassword){
+            confirmedPasswordError = "password dont match"
+        }
+        if(emailError || nameError || passwordError || confirmedPasswordError) {
+            hasErrors = false;
+            this.setState({emailError, nameError, passwordError, confirmedPasswordError}, callback(hasErrors));
+            return;
+        }
+        hasErrors  = true;
+        this.setState({emailError, nameError, passwordError, confirmedPasswordError}, callback(hasErrors));
     }
 
     handleChange = (event) => {
-        const isCheckbox = event.target.type === "checkbox";
         this.setState({
-            [event.target.name]: isCheckbox
-                ? event.target.checked
-                : event.target.value
+            [event.target.name] : event.target.value},
+            () => {
+            console.log(this.state)
+            this.validate((hasErrors) => {
+                if (hasErrors){
+                    this.setState({hasErrors: false});
+                } else {
+                    this.setState({hasErrors: true});
+                }
+            });
         });
-        const isValid = this.validate();
-        if (isValid){
-            this.setState({hasErrors: false});
-            console.log(this.state);
-        } else {
-            this.setState({hasErrors: true});
-        }
     }
 
     render() {
@@ -53,23 +68,28 @@ export default class Form extends React.Component {
                 <form action="/accounts/registration" method="post">
                     <h2 className="text-center">Registration</h2>
                     <div className="form-group">
-                        <input name="username" id="username" type="text" className="form-control"
+                        <input name="username" id="username" type="text"
+                               className={'form-control ' + ((this.state.username === "")? "" : ((this.state.nameError)?"is-invalid" : "is-valid"))}
                                placeholder="username"
                                required="required"
+                               value={this.state.username}
                                 onChange={this.handleChange}>
                         </input>
                         <span className="error">{this.state.nameError}</span>
                     </div>
                     <div className="form-group">
-                        <input name="email" id="email" type="email" className="form-control"
+                        <input name="email" id="email" type="email"
+                               className={'form-control ' + ((this.state.email === "")? "" : ((this.state.emailError)?"is-invalid" : "is-valid"))}
                                placeholder="email"
                                required="required"
+                               value={this.state.email}
                                onChange={this.handleChange}>
                         </input>
                         <span className="error">{this.state.emailError}</span>
                     </div>
                     <div className="form-group">
-                        <input type="password" name="password" id="password" className="form-control"
+                        <input type="password" name="password" id="password"
+                               className={'form-control ' + ((this.state.password === "")? "" : ((this.state.passwordError)?"is-invalid" : "is-valid"))}
                                placeholder="password"
                                value={this.state.password}
                                onChange={this.handleChange}
@@ -78,8 +98,12 @@ export default class Form extends React.Component {
                         <span className="error">{this.state.passwordError}</span>
                     </div>
                     <div className="form-group">
-                        <input type="password" name="confirmPassword" id="confirmPassword" className="form-control"
+                        <input type="password" name="confirmPassword" id="confirmPassword"
+                               className={'form-control ' + ((this.state.confirmPassword === "")
+                                   ? "" : ((this.state.confirmationPasswordError)?"is-invalid" : "is-valid"))}
                                placeholder="confirmPassword"
+                               value={this.state.confirmPassword}
+                               onChange={this.handleChange}
                                required="required">
                         </input>
                         <span className="error">{this.state.confirmedPasswordError}</span>
