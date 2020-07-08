@@ -38,13 +38,18 @@ public class OwnerService {
     @Transactional
     public void changeInspector(Report report) {
         List<User> inspectors = report.getInspectors();
-        Long inspectorId = archiveRepository.findDistinctFirstByReport(report)
+        if (inspectors.size() == 1) {
+            report.setStatus(ReportStatus.QUEUE);
+            reportsRepository.save(report);
+            return;
+        }
+        Long inspectorId = archiveRepository.findFirstByReportOrderByIdDesc(report)
                 .orElseThrow(RuntimeException::new).getInspectorDecision().getId();
         List<User> newInspectors = inspectors.stream()
                 .filter(inspector -> !inspector.getId().equals(inspectorId))
                 .collect(Collectors.toList());
         report.setStatus(ReportStatus.QUEUE);
-        report.setInspectors(getRandomElements(newInspectors));
+        report.setInspectors(newInspectors);
         reportsRepository.save(report);
     }
 
@@ -52,14 +57,8 @@ public class OwnerService {
         report.setStatus(ReportStatus.QUEUE);
         report.setOwner(owner);
         List<User> inspectors = getInspectors();
-        report.setInspectors(getRandomElements(inspectors));
+        report.setInspectors(inspectors);
         reportsRepository.save(report);
-    }
-
-    private static List<User> getRandomElements(List<User> list) {
-        Collections.shuffle(list);
-        int listSizeIndex = list.size();
-        return list.subList(0, listSizeIndex);
     }
 
 
